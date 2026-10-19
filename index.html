@@ -252,19 +252,25 @@ const DY=()=>{const d=new Date(),y=d.getFullYear()+543;return d.getMonth()<4?y-1
 
 const loadUsers=async()=>{
   try {
+    const local = localStorage.getItem(K+'_users');
+    if(local) { UL = JSON.parse(local); return; }
     const res = await fetch(GAS_URL + "?action=getUsers");
     const json = await res.json();
     if(json && json.length) UL = json;
     else UL = U.map(x=>[x[0],x[1],x[2],x[3],true]);
   } catch(e) {
-    UL = U.map(x=>[x[0],x[1],x[2],x[3],true]);
+    const local = localStorage.getItem(K+'_users');
+    if(local) UL = JSON.parse(local);
+    else UL = U.map(x=>[x[0],x[1],x[2],x[3],true]);
   }
 };
+
 const saveUsers=async()=>{
+  try { localStorage.setItem(K+'_users', JSON.stringify(UL)); } catch(e){}
   try {
     await fetch(GAS_URL, {method: 'POST', body: JSON.stringify({ action: "setUsers", u: UL })});
-    return true;
-  } catch(e) { return true; }
+  } catch(e) {}
+  return true;
 };
 
 const askIn=(msg,fn)=>{ask(msg);qs('#di').hidden=false;qs('#di').value='';qs('#dk').onclick=()=>{qs('#dlg').hidden=true;fn(qs('#di').value.trim())}};
@@ -275,7 +281,7 @@ async function rum(){await loadUsers();await loadLocks();const yrs=[...new Set([
  <div class="card" style="margin-bottom:12px"><b style="font-size:15px">ล็อกปีการศึกษา (ปีที่ล็อกดูและพิมพ์ได้อย่างเดียว แก้ไขไม่ได้)</b><div class="bar" style="margin:8px 0 0">${lkh}</div></div>
  <div class="wrap"><table><thead><tr><th>ชื่อผู้ใช้</th><th>ชื่อ-สกุล</th><th>สิทธิ์</th><th>สถานะ</th><th></th></tr></thead><tbody>${UL.map(r=>`<tr><td>${r[0]}</td><td style="text-align:left">${r[3]}</td><td>${r[2]=='admin'?'Admin':'User'}</td><td>${r[4]===false?'<span class="f">ปิดใช้งาน</span>':'<span class="p">ใช้งาน</span>'}</td><td><button class="hb2" data-a="pw" data-u="${r[0]}">รีเซ็ตรหัสผ่าน</button> <button class="hb2" data-a="tg" data-u="${r[0]}">${r[4]===false?'เปิดบัญชี':'ปิดบัญชี'}</button></td></tr>`).join('')}</tbody></table></div>`;
  qs('#na').onclick=async()=>{const u=qs('#nu').value.trim().toLowerCase(),n=qs('#nn').value.trim(),p=qs('#np').value;if(!/^[a-z0-9_.@+~:-]{2,30}$/.test(u))return ask('ชื่อผู้ใช้ใช้ได้เฉพาะอังกฤษ ตัวเลข และ _ . - (2–30 ตัว)');if(!n||p.length<4)return ask('กรอกชื่อ-สกุล และรหัสผ่านอย่างน้อย 4 ตัวอักษร');await loadUsers();if(UL.some(r=>r[0]==u))return ask('มีชื่อผู้ใช้นี้อยู่แล้ว');UL.push([u,await sha(`pp5:${u}:${p}`),qs('#nr').value,n.replace(/[<>"'&]/g,''),true]);if(await saveUsers())rum()};
- qs('#tb').onclick=()=>{const f=qs('#tf').value,t=qs('#tt').value;if(f==t)return ask('เลือกครูต้นทางและปลายทางให้ต่างกัน');ask(`โอนรายวิชาทั้งหมดของ ${f} ไปให้ ${t}?`,async()=>{try{const d=await dbq(),to=UL.find(r=>r[0]==t),s=await d.collection('wbm').where('own','==f').get();for(const x of s.docs){await d.doc('wbm/'+x.id).update({own:t,ownName:to[3]});await d.doc('wb/'+x.id).update({own:t})}ask(`โอนแล้ว ${s.docs.length} รายวิชา`)}catch(e){ask('โอนไม่สำเร็จ (ต้องเชื่อมฐานข้อมูลกลางและมีสิทธิ์แก้ไข)')}})};}
+ qs('#tb').onclick=()=>{const f=qs('#tf').value,t=qs('#tt').value;if(f==t)return ask('เลือกครูต้นทางและปลายทางให้ต่างกัน');ask(`โอนรายวิชาทั้งหมดของ ${f} ไปให้ ${t}?`,async()=>{try{const d=await dbq(),to=UL.find(r=>r[0]==t),s=await d.collection('wbm').where('own','==',f).get();for(const x of s.docs){await d.doc('wbm/'+x.id).update({own:t,ownName:to[3]});await d.doc('wb/'+x.id).update({own:t})}ask(`โอนแล้ว ${s.docs.length} รายวิชา`)}catch(e){ask('โอนไม่สำเร็จ (ต้องเชื่อมฐานข้อมูลกลางและมีสิทธิ์แก้ไข)')}})};}
 m.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-a]');if(!b)return;const u=b.dataset.u;
  if(b.dataset.a=='pw')askIn(`ตั้งรหัสผ่านใหม่ของ ${u}`,async p=>{if(p.length<4)return ask('รหัสผ่านต้องยาวอย่างน้อย 4 ตัวอักษร');await loadUsers();const r=UL.find(x=>x[0]==u);r[1]=await sha(`pp5:${u}:${p}`);if(await saveUsers())ask('เปลี่ยนรหัสผ่านแล้ว')});
  else if(b.dataset.a=='tg'){if(u==ME.u)return ask('ปิดบัญชีของตัวเองไม่ได้');await loadUsers();const r=UL.find(x=>x[0]==u);r[4]=r[4]===false;if(await saveUsers())rum()}});
@@ -284,15 +290,22 @@ qs('#um').onclick=()=>{WB=null;ui();go('um')};
 let RO=false,LK=[],HC=null,hq='';
 const loadLocks=async()=>{
   try {
+    const local = localStorage.getItem(K+'_locks');
+    if(local) { LK = JSON.parse(local); return; }
     const res = await fetch(GAS_URL + "?action=getLocks");
     LK = await res.json() || [];
-  } catch(e) { LK = []; }
+  } catch(e) { 
+    const local = localStorage.getItem(K+'_locks');
+    if(local) LK = JSON.parse(local);
+    else LK = []; 
+  }
 };
 const saveLocks=async()=>{
+  try { localStorage.setItem(K+'_locks', JSON.stringify(LK)); } catch(e){}
   try {
     await fetch(GAS_URL, {method: 'POST', body: JSON.stringify({ action: "setLocks", lk: LK })});
-    return true;
-  } catch(e) { return true; }
+  } catch(e) {}
+  return true;
 };
 
 const lockUI=()=>{if(!RO||!WB||['hm','um','hs'].includes(view))return;m.querySelectorAll('[data-i],[data-cv],#r3,#ii,#xi').forEach(e=>e.disabled=true);if(!m.querySelector('.lockb'))m.insertAdjacentHTML('afterbegin','<div class="bar lockb"><b>🔒 ปีการศึกษา '+CV.year+' ถูกล็อก ดูและพิมพ์ได้อย่างเดียว</b></div>')};

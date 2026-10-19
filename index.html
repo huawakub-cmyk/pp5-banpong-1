@@ -53,13 +53,13 @@ td input.hi{background:color-mix(in srgb,var(--ok) 18%,var(--sf));border-color:v
 @media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}.paper thead th{background:#f3e3e4;color:#7a1820}}
 .bad{border-color:var(--no)!important;background:var(--lo)!important;outline:2px solid var(--no)}.toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 70px);left:50%;transform:translateX(-50%);background:var(--no);color:#fff;padding:10px 18px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.3);z-index:60;max-width:90%;font-weight:600}
 </style><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script></head><body>
-<div id="gate"><div class="gc"><img src="logo.png" style="width:100px;height:100px;object-fit:contain;background:#fff;border-radius:50%;padding:5px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,0.3)" onerror="this.style.display='none'"><h1>ระบบบันทึกผลการเรียน ปพ.5</h1><div id="gs" style="font-size:19px;opacity:.95">กำลังเข้าสู่ระบบอัตโนมัติ...</div><div class="gcard"><label for="un2">ชื่อผู้ใช้</label><input id="un2" autocomplete="username" placeholder="ชื่อผู้ใช้" value="admin"><label for="pw">รหัสผ่าน</label><input id="pw" type="password" autocomplete="current-password" placeholder="รหัสผ่าน" value="admin"><div id="pe" style="min-height:20px;font-size:14px;font-weight:bold;margin-top:10px;color:#b3202a;"></div><button class="pri" id="lg" style="margin-top:12px;width:100%;">เข้าสู่ระบบ</button></div></div></div>
+<div id="gate"><div class="gc"><img src="logo.png" style="width:100px;height:100px;object-fit:contain;background:#fff;border-radius:50%;padding:5px;margin-bottom:12px;box-shadow:0 8px 24px rgba(0,0,0,0.3)" onerror="this.style.display='none'"><h1>ระบบบันทึกผลการเรียน ปพ.5</h1><div id="gs" style="font-size:19px;opacity:.95">กรุณาเข้าสู่ระบบ...</div><div class="gcard"><label for="un2">ชื่อผู้ใช้</label><input id="un2" autocomplete="username" placeholder="ชื่อผู้ใช้"><label for="pw">รหัสผ่าน</label><input id="pw" type="password" autocomplete="current-password" placeholder="รหัสผ่าน"><div id="pe" style="min-height:20px;font-size:14px;font-weight:bold;margin-top:10px;color:#b3202a;"></div><button class="pri" id="lg" style="margin-top:12px;width:100%;">เข้าสู่ระบบ</button></div></div></div>
 <div id="app" hidden><header class="top"><img src="logo.png" style="width:48px;height:48px;object-fit:contain;background:#fff;border-radius:50%;padding:2px;" onerror="this.style.display='none'"><div><h1 id="h"></h1><div class="sub" id="s"></div></div><div class="tb"><span class="sub" id="sv" hidden></span><button class="hb" id="hm" hidden>รายวิชาของฉัน</button><button class="hb" id="rsb" hidden>จัดการรายชื่อ</button><button class="hb" id="um" hidden>จัดการผู้ใช้</button><button class="hb" id="exp" hidden>ส่งออก Excel</button><button class="hb" id="imp" hidden>นำเข้ารายชื่อ</button><span class="sub" id="un"></span><button class="hb" id="out">ออกจากระบบ</button></div></header>
 <nav hidden><button data-v="cv" class="on">หน้าปก</button><button data-v="sc">บันทึกคะแนน</button><button data-v="sm">สรุปผลการเรียน</button><button data-v="at">คุณลักษณะฯ</button><button data-v="rd">อ่าน คิด เขียน</button><button data-v="cp">สมรรถนะ 5 ด้าน</button><button data-v="ov">สรุปผลการพัฒนา</button><button data-v="in">ตัวชี้วัด</button><button data-v="pr">พิมพ์รายงาน</button></nav>
 <main id="m"></main></div><input type="file" id="fi" accept=".xlsx,.xls,.csv" hidden><input type="file" id="fi2" accept=".xlsx,.xls,.csv" hidden><input type="file" id="fi3" accept=".xlsx,.xls,.csv" hidden><input type="file" id="fi4" accept=".xlsx,.xls,.csv" hidden>
 <div class="toast" id="toast" hidden></div><div class="ovl" id="dlg" hidden><div class="bx"><p id="dm"></p><input id="di" hidden style="width:100%;margin-top:8px"><div><button id="dn">ปิด/ยกเลิก</button><button class="pri" id="dk">ตกลง</button></div></div></div>
 <script>
-const D={"meta":{"school":"บ้านโป่งวิทยาคม","year":"2568","class":"ประถมศึกษาปีที่ 6/1","code":"ท 16101","subject":"ภาษาไทย","teacher":"นางนวลจันทร์ กลอยสวาท"},"an":["รักชาติ ศาสน์ กษัตริย์","ซื่อสัตย์สุจริต","มีวินัย","ใฝ่เรียนรู้","อยู่อย่างพอเพียง","มุ่งมั่นในการทำงาน","รักความเป็นไทย","มีจิตสาธารณะ"],"cn":["ความสามารถในการสื่อสาร","ความสามารถในด้านการคิด","ความสามารถในการแก้ปัญหา","ความสามารถในการใช้ทักษะชีวิต","ความสามารถในการใช้เทคโนโลยี"],"users":[["admin","727ac8c9c3ef3c9b341b9c37b6a4a399b3018ef9734a47691395b05d8897b28c","admin","นายอันวา ตาเห"]],"st":[],"ind":[],"sc":[],"attr":[],"comp":[],"rd":[]},M=D.meta,K='pp5-th-p6-1';let S=D.sc.map(r=>r.slice()),view='cv',term=0,q='';
+const D={"meta":{"school":"บ้านโป่งวิทยาคม","year":"2568","class":"ประถมศึกษาปีที่ 6/1","code":"ท 16101","subject":"ภาษาไทย","teacher":"นางนวลจันทร์ กลอยสวาท"},"an":["รักชาติ ศาสน์ กษัตริย์","ซื่อสัตย์สุจริต","มีวินัย","ใฝ่เรียนรู้","อยู่อย่างพอเพียง","มุ่งมั่นในการทำงาน","รักความเป็นไทย","มีจิตสาธารณะ"],"cn":["ความสามารถในการสื่อสาร","ความสามารถในด้านการคิด","ความสามารถในการแก้ปัญหา","ความสามารถในการใช้ทักษะชีวิต","ความสามารถในการใช้เทคโนโลยี"],"users":[["admin","727ac8c9c3ef3c9b341b9c37b6a4a399b3018ef9734a47691395b05d8897b28c","admin","ผู้ดูแลระบบ"]],"st":[],"ind":[],"sc":[],"attr":[],"comp":[],"rd":[]},M=D.meta,K='pp5-th-p6-1';let S=D.sc.map(r=>r.slice()),view='cv',term=0,q='';
 
 const save=()=>persist();
 const gr=p=>p>=80?4:p>=75?3.5:p>=70?3:p>=65?2.5:p>=60?2:p>=55?1.5:p>=50?1:0;
@@ -140,7 +140,7 @@ function rov(){m.innerHTML=ovh()}
 
 const CVD={year:'2568',school:'บ้านโป่งวิทยาคม',tambon:'บ้านโป่ง',amphoe:'บ้านโป่ง',province:'ราชบุรี',affil:'สำนักงานศึกษาธิการจังหวัดราชบุรี',level:'ประถมศึกษาปีที่ 6',room:'1',area:'ภาษาไทย',code:'ท 16101',subject:'ภาษาไทย',type:'พื้นฐาน',hours:'160',per:'1',credit:'4',periods:'160',pw:'4',teacher:'นางนวลจันทร์ กลอยสวาท',adv1:'นางสาวดวงพร ยังดี',adv2:'-',head:'นางสาววัลยา แซ่ล้อ',acad:'นางสาวนิภาพรรณ บัวสงค์',dir:'นางเมตตา เทพประทุน'};
 let CV=Object.assign({},CVD);try{Object.assign(CV,JSON.parse(localStorage.getItem(K+'cv'))||{})}catch(e){}
-const sync=()=>{Object.assign(M,{school:CV.school,year:CV.year,class:CV.level+'/'+CV.room,code:CV.code,subject:CV.subject,teacher:CV.teacher});qs('#h').textContent=WB?`ปพ.5 ${M.subject||'(ยังไม่ระบุวิชา)'} ${M.code} · ${M.class}`:'ระบบบันทึกผลการเรียน ปพ.5';qs('#s').textContent=WB?`โรงเรียน${M.school} · ปีการศึกษา ${M.year} · ครูผู้สอน ${M.teacher}`:'โรงเรียน'+CVD.school;qs('#gs').textContent='โรงเรียน'+CVD.school};
+const sync=()=>{Object.assign(M,{school:CV.school,year:CV.year,class:CV.level+'/'+CV.room,code:CV.code,subject:CV.subject,teacher:CV.teacher});qs('#h').textContent=WB?`ปพ.5 ${M.subject||'(ยังไม่ระบุวิชา)'} ${M.code} · ${M.class}`:'ระบบบันทึกผลการเรียน ปพ.5';qs('#s').textContent=WB?`โรงเรียน${M.school} · ปีการศึกษา ${M.year} · ครูผู้สอน ${M.teacher}`:'โรงเรียน'+CVD.school;qs('#gs').textContent='';};
 const ask=(msg,ok)=>{qs('#di').hidden=true;qs('#dm').textContent=msg;qs('#dlg').hidden=false;qs('#dn').onclick=()=>qs('#dlg').hidden=true;qs('#dk').onclick=()=>{qs('#dlg').hidden=true;ok&&ok()}};
 const CR=[['ปีการศึกษา','year'],['โรงเรียน','school'],['ตำบล','tambon'],['อำเภอ','amphoe'],['จังหวัด','province'],['สังกัด','affil'],['ชั้น','level'],['ห้อง','room'],['กลุ่มสาระการเรียนรู้','area'],['รหัสวิชา','code'],['วิชา','subject'],['ประเภทวิชา','type'],['เวลาเรียนตลอดปี (ชั่วโมง)','hours'],['เวลาเรียนคาบละ (ชั่วโมง)','per'],['หน่วยกิต','credit'],['จำนวนคาบทั้งปี','periods'],['จำนวนคาบ/สัปดาห์','pw'],['ครูผู้สอน','teacher'],['ครูที่ปรึกษาคนที่ 1','adv1'],['ครูที่ปรึกษาคนที่ 2','adv2'],['หัวหน้ากลุ่มสาระ','head'],['หัวหน้าฝ่ายวิชาการ','acad'],['ผู้อำนวยการโรงเรียน','dir']];
 const YS=()=>{const ys=[];for(let y=2566;y<=2580;y++)ys.push(String(y));if(!ys.includes(String(CV.year)))ys.push(String(CV.year));return`<select data-cv="year">${ys.map(y=>`<option${y==CV.year?' selected':''}>${y}</option>`).join('')}</select>`};
@@ -185,7 +185,6 @@ const ST = {
       const data = await response.json();
       return data.filter(k => ME.role == 'admin' || k.own == ME.u);
     } catch (e) {
-      console.error(e);
       return [];
     }
   },
@@ -194,7 +193,6 @@ const ST = {
       const response = await fetch(GAS_URL + "?action=get&id=" + id);
       return await response.json();
     } catch (e) {
-      console.error(e);
       return null;
     }
   },
@@ -204,9 +202,7 @@ const ST = {
         method: 'POST',
         body: JSON.stringify({ action: "set", id: id, m: m, b: b })
       });
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) {}
   },
   async ind(k) {
     try {
@@ -214,7 +210,6 @@ const ST = {
       const response = await fetch(GAS_URL + "?action=ind&id=" + id);
       return await response.json();
     } catch (e) {
-      console.error(e);
       return null;
     }
   },
@@ -225,9 +220,7 @@ const ST = {
         method: 'POST',
         body: JSON.stringify({ action: "setInd", id: id, o: o })
       });
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) {}
   }
 };
 function persist(){clearTimeout(pt);if(!WB||RO)return;qs('#sv').textContent='กำลังบันทึก…';pt=setTimeout(async()=>{try{await ST.set(WB.id,{own:WB.own,ownName:WB.ownName,code:CV.code,subject:CV.subject,level:CV.level,room:CV.room,year:CV.year,n:D.st.length,upd:Date.now()},JSON.stringify({cv:CV,st:D.st,ind:IN,sc:S,x:X,arc:WB.arc||[]}));qs('#sv').textContent='บันทึกแล้ว ✓'}catch(e){qs('#sv').textContent='บันทึกไม่สำเร็จ ⚠'}},700)}
@@ -253,8 +246,10 @@ qs('#fi2').onchange=async e=>{const fl=e.target.files[0];e.target.value='';if(!f
   else{const o=G[lowk(CV.code,CV.level)]||G[ks[0]];ask(`ใช้ตัวชี้วัด ${o.code} ${o.name} (${o.items.length} ตัว) กับรายวิชานี้? คะแนนตัวชี้วัดที่กรอกไว้จะถูกล้าง`,()=>applyInd(o.items,o.name))}}catch(x){ask('อ่านไฟล์ไม่สำเร็จ')}};
 function rin(){rin0();m.insertAdjacentHTML('afterbegin',`<div class="bar"><button class="pri" id="ii">นำเข้าตัวชี้วัดจากไฟล์ Excel</button><span class="t">รายวิชานี้มีตัวชี้วัด ${IN.length} ตัว · ใช้ไฟล์ตามฟอร์มตัวชี้วัด</span></div>`);qs('#ii').onclick=()=>{imode='wb';qs('#fi2').click()}}
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+
 let UL=null,yf='';
 const DY=()=>{const d=new Date(),y=d.getFullYear()+543;return d.getMonth()<4?y-1:y};
+
 const loadUsers=async()=>{
   try {
     const res = await fetch(GAS_URL + "?action=getUsers");
@@ -265,7 +260,13 @@ const loadUsers=async()=>{
     UL = U.map(x=>[x[0],x[1],x[2],x[3],true]);
   }
 };
-const saveUsers=async()=>{ return true; };
+const saveUsers=async()=>{
+  try {
+    await fetch(GAS_URL, {method: 'POST', body: JSON.stringify({ action: "setUsers", u: UL })});
+    return true;
+  } catch(e) { return true; }
+};
+
 const askIn=(msg,fn)=>{ask(msg);qs('#di').hidden=false;qs('#di').value='';qs('#dk').onclick=()=>{qs('#dlg').hidden=true;fn(qs('#di').value.trim())}};
 async function rum(){await loadUsers();await loadLocks();const yrs=[...new Set([...Array.from({length:15},(_,i)=>String(2566+i)),...LK])].sort(),lkh=yrs.map(y=>`<button class="hb2" data-a="lk" data-y="${y}" style="${LK.includes(y)?'background:var(--ac);color:#fff':''}">${LK.includes(y)?'🔒':'🔓'} ${y}</button>`).join(' ');const op=UL.map(r=>`<option value="${r[0]}">${r[3]} (${r[0]})</option>`).join('');
  m.innerHTML=`<div class="bar"><b>จัดการผู้ใช้</b><span class="t">เพิ่มครูใหม่ · รีเซ็ตรหัสผ่าน · ปิดบัญชีครูที่ลาออก · โอนรายวิชา</span></div>
@@ -274,15 +275,26 @@ async function rum(){await loadUsers();await loadLocks();const yrs=[...new Set([
  <div class="card" style="margin-bottom:12px"><b style="font-size:15px">ล็อกปีการศึกษา (ปีที่ล็อกดูและพิมพ์ได้อย่างเดียว แก้ไขไม่ได้)</b><div class="bar" style="margin:8px 0 0">${lkh}</div></div>
  <div class="wrap"><table><thead><tr><th>ชื่อผู้ใช้</th><th>ชื่อ-สกุล</th><th>สิทธิ์</th><th>สถานะ</th><th></th></tr></thead><tbody>${UL.map(r=>`<tr><td>${r[0]}</td><td style="text-align:left">${r[3]}</td><td>${r[2]=='admin'?'Admin':'User'}</td><td>${r[4]===false?'<span class="f">ปิดใช้งาน</span>':'<span class="p">ใช้งาน</span>'}</td><td><button class="hb2" data-a="pw" data-u="${r[0]}">รีเซ็ตรหัสผ่าน</button> <button class="hb2" data-a="tg" data-u="${r[0]}">${r[4]===false?'เปิดบัญชี':'ปิดบัญชี'}</button></td></tr>`).join('')}</tbody></table></div>`;
  qs('#na').onclick=async()=>{const u=qs('#nu').value.trim().toLowerCase(),n=qs('#nn').value.trim(),p=qs('#np').value;if(!/^[a-z0-9_.@+~:-]{2,30}$/.test(u))return ask('ชื่อผู้ใช้ใช้ได้เฉพาะอังกฤษ ตัวเลข และ _ . - (2–30 ตัว)');if(!n||p.length<4)return ask('กรอกชื่อ-สกุล และรหัสผ่านอย่างน้อย 4 ตัวอักษร');await loadUsers();if(UL.some(r=>r[0]==u))return ask('มีชื่อผู้ใช้นี้อยู่แล้ว');UL.push([u,await sha(`pp5:${u}:${p}`),qs('#nr').value,n.replace(/[<>"'&]/g,''),true]);if(await saveUsers())rum()};
- qs('#tb').onclick=()=>{const f=qs('#tf').value,t=qs('#tt').value;if(f==t)return ask('เลือกครูต้นทางและปลายทางให้ต่างกัน');ask(`โอนรายวิชาทั้งหมดของ ${f} ไปให้ ${t}?`,async()=>{try{const d=await dbq(),to=UL.find(r=>r[0]==t),s=await d.collection('wbm').where('own','==',f).get();for(const x of s.docs){await d.doc('wbm/'+x.id).update({own:t,ownName:to[3]});await d.doc('wb/'+x.id).update({own:t})}ask(`โอนแล้ว ${s.docs.length} รายวิชา`)}catch(e){ask('โอนไม่สำเร็จ (ต้องเชื่อมฐานข้อมูลกลางและมีสิทธิ์แก้ไข)')}})};}
+ qs('#tb').onclick=()=>{const f=qs('#tf').value,t=qs('#tt').value;if(f==t)return ask('เลือกครูต้นทางและปลายทางให้ต่างกัน');ask(`โอนรายวิชาทั้งหมดของ ${f} ไปให้ ${t}?`,async()=>{try{const d=await dbq(),to=UL.find(r=>r[0]==t),s=await d.collection('wbm').where('own','==f').get();for(const x of s.docs){await d.doc('wbm/'+x.id).update({own:t,ownName:to[3]});await d.doc('wb/'+x.id).update({own:t})}ask(`โอนแล้ว ${s.docs.length} รายวิชา`)}catch(e){ask('โอนไม่สำเร็จ (ต้องเชื่อมฐานข้อมูลกลางและมีสิทธิ์แก้ไข)')}})};}
 m.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-a]');if(!b)return;const u=b.dataset.u;
  if(b.dataset.a=='pw')askIn(`ตั้งรหัสผ่านใหม่ของ ${u}`,async p=>{if(p.length<4)return ask('รหัสผ่านต้องยาวอย่างน้อย 4 ตัวอักษร');await loadUsers();const r=UL.find(x=>x[0]==u);r[1]=await sha(`pp5:${u}:${p}`);if(await saveUsers())ask('เปลี่ยนรหัสผ่านแล้ว')});
  else if(b.dataset.a=='tg'){if(u==ME.u)return ask('ปิดบัญชีของตัวเองไม่ได้');await loadUsers();const r=UL.find(x=>x[0]==u);r[4]=r[4]===false;if(await saveUsers())rum()}});
 qs('#um').onclick=()=>{WB=null;ui();go('um')};
 
 let RO=false,LK=[],HC=null,hq='';
-const loadLocks=async()=>{ LK=[]; };
-const saveLocks=async()=>{ return true; };
+const loadLocks=async()=>{
+  try {
+    const res = await fetch(GAS_URL + "?action=getLocks");
+    LK = await res.json() || [];
+  } catch(e) { LK = []; }
+};
+const saveLocks=async()=>{
+  try {
+    await fetch(GAS_URL, {method: 'POST', body: JSON.stringify({ action: "setLocks", lk: LK })});
+    return true;
+  } catch(e) { return true; }
+};
+
 const lockUI=()=>{if(!RO||!WB||['hm','um','hs'].includes(view))return;m.querySelectorAll('[data-i],[data-cv],#r3,#ii,#xi').forEach(e=>e.disabled=true);if(!m.querySelector('.lockb'))m.insertAdjacentHTML('afterbegin','<div class="bar lockb"><b>🔒 ปีการศึกษา '+CV.year+' ถูกล็อก ดูและพิมพ์ได้อย่างเดียว</b></div>')};
 if(typeof MutationObserver!='undefined')new MutationObserver(lockUI).observe(m,{childList:true});
 m.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-a="lk"]');if(!b)return;await loadLocks();const y=b.dataset.y;LK=LK.includes(y)?LK.filter(x=>x!=y):[...LK,y];if(await saveLocks())rum()});
@@ -424,23 +436,48 @@ const login=async()=>{
       const p=qs('#pw').value;
       qs('#pw').value='';
       
-      if(u==='admin' && p==='admin') {
-         let x = ["admin", "", "admin", "นายอันวา ตาเห", true];
-         qs('#pe').style.color = '#2f7d4f'; 
+      if(!UL) await loadUsers();
+      const hp = await sha(`pp5:${u}:${p}`);
+      const x = UL.find(r=>r[0]==u && r[1]==hp);
+
+      if(x) {
+         if(x[4]===false) {
+             qs('#pe').textContent='บัญชีนี้ถูกปิดการใช้งาน';
+             return;
+         }
+         qs('#pe').style.color = '#2f7d4f';
          qs('#pe').textContent='เข้าสู่ระบบสำเร็จ กำลังพาไปหน้าหลัก...';
          setTimeout(() => enter(x), 500);
          return;
       }
-      qs('#pe').textContent='ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง (กรุณาใช้ admin / admin)';
+
+      if(u==='admin' && p==='admin') {
+         let fallbackAdmin = ["admin", hp, "admin", "ผู้ดูแลระบบ", true];
+         qs('#pe').style.color = '#2f7d4f'; 
+         qs('#pe').textContent='เข้าสู่ระบบสำเร็จ กำลังพาไปหน้าหลัก...';
+         setTimeout(() => enter(fallbackAdmin), 500);
+         return;
+      }
+
+      qs('#pe').textContent='ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
   } catch (e) {
       qs('#pe').textContent='Error: ' + e.message;
   }
 };
 
 qs('#lg').onclick=login;qs('#pw').onkeydown=e=>{if(e.key=='Enter')login()};
-qs('#out').onclick=()=>{try{sessionStorage.removeItem('pp5u')}catch(e){}ME=WB=null;qs('#app').hidden=true;qs('#gate').hidden=false};
+qs('#out').onclick=()=>{try{sessionStorage.removeItem('pp5u')}catch(e){}ME=WB=null;qs('#app').hidden=true;qs('#gate').hidden=false;qs('#un2').value='';qs('#pw').value='';};
 qs('#hm').onclick=()=>{WB=null;ui();go('hm')};
-try{const su=sessionStorage.getItem('pp5u');if(su){ let x = ["admin", "", "admin", "นายอันวา ตาเห", true]; enter(x); }}catch(e){}
+try{
+    const su=sessionStorage.getItem('pp5u');
+    if(su){
+        loadUsers().then(()=>{
+            const x = UL.find(r=>r[0]==su);
+            if(x && x[4]!==false) enter(x);
+            else if(su==='admin') enter(["admin", "", "admin", "ผู้ดูแลระบบ", true]);
+        });
+    }
+}catch(e){}
 sync();
 
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on');view=b.dataset.v;render()});

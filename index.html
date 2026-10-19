@@ -171,7 +171,7 @@ qs('#fi').onchange=async e=>{const fl=e.target.files[0];e.target.value='';if(!fl
   ask(`พบรายชื่อ ${L.length} คน — แทนที่รายชื่อเดิม และรีเซ็ตคะแนนทั้งหมด (ตัวชี้วัดว่าง คุณลักษณะ/อ่านคิดเขียน/สมรรถนะ = 3) ใช่หรือไม่?`,()=>{D.st=L;S=L.map(()=>Array(IN.length).fill(null));X=fresh();save();saveX();render()})
  }catch(x){ask('อ่านไฟล์ไม่สำเร็จ ลองใช้ไฟล์ .xlsx หรือ .csv')}};
 const U=D.users,esc0=c=>c,cl=v=>typeof v=='string'?v.replace(/[<>"'&]/g,''):Array.isArray(v)?v.map(cl):v&&typeof v=='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,cl(x)])):v;
-let ME=null,WB=null,DB=null,pt=null,imode='';
+let ME=null,WB=null,DB=null,pt=null,imode='',trash=false;
 const lowk=(c,l)=>String(c).replace(/\s+/g,''),hid=s=>{let h=5381;for(const ch of s)h=((h<<5)+h+ch.codePointAt(0))>>>0;return'i'+h.toString(36)};
 const dbq=async()=>{if(DB===null){DB=false;}return DB;};
 
@@ -236,15 +236,26 @@ const ST = {
   }
 };
 
-function persist(){clearTimeout(pt);if(!WB||RO)return;qs('#sv').textContent='กำลังบันทึก…';pt=setTimeout(async()=>{try{await ST.set(WB.id,{own:WB.own,ownName:WB.ownName,code:CV.code,subject:CV.subject,level:CV.level,room:CV.room,year:CV.year,n:D.st.length,upd:Date.now()},JSON.stringify({cv:CV,st:D.st,ind:IN,sc:S,x:X,arc:WB.arc||[]}));qs('#sv').textContent='บันทึกแล้ว ✓'}catch(e){qs('#sv').textContent='บันทึกไม่สำเร็จ ⚠'}},700)}
+function persist(flush=false){
+  clearTimeout(pt);
+  if(!WB||RO)return;
+  const currentWB = WB;
+  const run = async()=>{
+    try{
+      await ST.set(currentWB.id,{own:currentWB.own,ownName:currentWB.ownName,code:CV.code,subject:CV.subject,level:CV.level,room:CV.room,year:CV.year,n:D.st.length,upd:Date.now()},JSON.stringify({cv:CV,st:D.st,ind:IN,sc:S,x:X,arc:currentWB.arc||[]}));
+      if(qs('#sv')) qs('#sv').textContent='บันทึกแล้ว ✓';
+    }catch(e){if(qs('#sv')) qs('#sv').textContent='บันทึกไม่สำเร็จ ⚠'}
+  };
+  if(flush) { run(); } else { qs('#sv').textContent='กำลังบันทึก…'; pt=setTimeout(run, 700); }
+}
 const ui=()=>{['nav','#hm','#sv','#exp'].forEach(s=>qs(s).hidden=!WB);qs('#imp').hidden=true;sync()};
 const go=v=>{view=v;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v==v));render()};
 async function openWB(id){try{const b=await ST.get(id);if(!b)return ask('เปิดข้อมูลไม่ได้ (ไม่มีสิทธิ์หรือไม่พบข้อมูล)');const l=(await ST.list()).find(x=>x.id==id)||{};WB={id,own:l.own||ME.u,ownName:l.ownName||ME.name,arc:cl(b.arc||[])};Object.keys(CV).forEach(k=>delete CV[k]);Object.assign(CV,CVD,cl(b.cv));D.st=cl(b.st);setIN(cl(b.ind||[]));S=b.sc;X=b.x;f3(X.A);f3(X.C);f3(X.R);await loadLocks();RO=LK.includes(String(CV.year));if(!RO){const R=await getRoster();if(R&&reconcile(R))persist()}sync();ui();go('cv')}catch(e){ask('เปิดข้อมูลไม่สำเร็จ')}}
-function newWB(){WB={id:'w'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),own:ME.u,ownName:ME.name,arc:[]};Object.keys(CV).forEach(k=>delete CV[k]);Object.assign(CV,CVD,{year:String(DY()),teacher:ME.name,code:'',subject:'',area:'',level:'',room:'',adv1:'',adv2:'-',head:''});D.st=[];setIN([]);S=[];X=fresh();RO=false;sync();ui();persist();go('cv')}
+function newWB(){if(WB) persist(true);WB={id:'w'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),own:ME.u,ownName:ME.name,arc:[]};Object.keys(CV).forEach(k=>delete CV[k]);Object.assign(CV,CVD,{year:String(DY()),teacher:ME.name,code:'',subject:'',area:'',level:'',room:'',adv1:'',adv2:'-',head:''});D.st=[];setIN([]);S=[];X=fresh();RO=false;sync();ui();persist();go('cv')}
 async function rhm(){m.innerHTML='<p class="mu">กำลังโหลด…</p>';let L=[];try{L=await ST.list()}catch(e){}
  const ys=[...new Set(L.map(w=>w.year).filter(Boolean))].sort().reverse(),nt=L.filter(w=>w.del).length;
  m.innerHTML=`<div class="bar"><b>สวัสดี ${ME.name}</b><button class="pri" id="nw">+ สร้างรายวิชาใหม่</button><select id="yf"><option value="">ทุกปีการศึกษา</option>${ys.map(y=>`<option${y==yf?' selected':''}>${y}</option>`).join('')}</select>${ME.role=='admin'?'<button class="pri" id="ai">อัปโหลดฐานข้อมูลตัวชี้วัด</button>':''}<button class="pri" id="hsb">ประวัติรายคน</button><button class="pri" id="exa">ส่งออกทุกรายวิชา (Excel)</button>${ME.role=='admin'?`<button class="hb2" id="tr">${trash?'← กลับรายวิชา':'ถังขยะ ('+nt+')'}</button>`:''}<span class="t">ข้อมูลทั้งหมดถูกจัดเก็บในเครื่องคอมพิวเตอร์ของคุณ</span></div><div class="cards">${L.filter(w=>(!yf||w.year==yf)&&(trash?w.del:!w.del)).sort((a,b)=>(b.upd||0)-(a.upd||0)).map(w=>'<div class="card wc" data-w="'+w.id+'" style="cursor:pointer"><b style="font-size:17px">'+(w.subject||'(ยังไม่ระบุวิชา)')+'</b><span>'+(w.code||'')+' · '+(w.level||'')+'/'+(w.room||'')+' · ปี '+(w.year||'')+'<br>ครู '+(w.ownName||'')+' · '+(w.n||0)+' คน</span><div style="margin-top:6px">'+(trash?'<button class="hb2" data-a="rs2" data-w="'+w.id+'">กู้คืน</button> <button class="hb2" data-a="pg" data-w="'+w.id+'">ลบถาวร</button>':'<button class="hb2" data-a="cy" data-w="'+w.id+'">คัดลอกไปปีการศึกษาใหม่</button> <button class="hb2" data-a="dl" data-w="'+w.id+'">ลบรายวิชา</button>')+'</div></div>').join('')||'<p class="mu">ยังไม่มีรายวิชา กด "สร้างรายวิชาใหม่"</p>'}</div>`;
- qs('#nw').onclick=newWB;qs('#yf').onchange=e=>{yf=e.target.value;rhm()};qs('#hsb').onclick=()=>go('hs');qs('#exa').onclick=exAll;if(qs('#tr'))qs('#tr').onclick=()=>{trash=!trash;rhm()};if(qs('#ai'))qs('#ai').onclick=()=>{imode='adm';qs('#fi2').click()}}
+ qs('#nw').onclick=newWB;qs('#yf').onchange=e=>{yf=e.target.value;rhm()};qs('#hsb').onclick=()=>{if(WB) persist(true); WB=null; ui(); go('hs');};qs('#exa').onclick=exAll;if(qs('#tr'))qs('#tr').onclick=()=>{trash=!trash;rhm()};if(qs('#ai'))qs('#ai').onclick=()=>{imode='adm';qs('#fi2').click()}}
 m.addEventListener('click',e=>{const c=e.target.closest&&e.target.closest('.wc');if(c&&!trash&&!e.target.closest('[data-a]'))openWB(c.dataset.w)});
 const applyInd=(it,name)=>{setIN(it);S=D.st.map(()=>Array(IN.length).fill(null));if(name&&!CV.subject)CV.subject=name;persist();render()};
 m.addEventListener('change',async e=>{const k=e.target.dataset.cv;if(k!='code'||!CV.code)return;const o=await ST.ind(lowk(CV.code,CV.level));
@@ -285,7 +296,7 @@ async function rum(){await loadUsers();await loadLocks();const yrs=[...new Set([
 m.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-a]');if(!b)return;const u=b.dataset.u;
  if(b.dataset.a=='pw')askIn(`ตั้งรหัสผ่านใหม่ของ ${u}`,async p=>{if(p.length<4)return ask('รหัสผ่านต้องยาวอย่างน้อย 4 ตัวอักษร');await loadUsers();const r=UL.find(x=>x[0]==u);r[1]=await sha(`pp5:${u}:${p}`);if(await saveUsers())ask('เปลี่ยนรหัสผ่านแล้ว')});
  else if(b.dataset.a=='tg'){if(u==ME.u)return ask('ปิดบัญชีของตัวเองไม่ได้');await loadUsers();const r=UL.find(x=>x[0]==u);r[4]=r[4]===false;if(await saveUsers())rum()}});
-qs('#um').onclick=()=>{WB=null;ui();go('um')};
+qs('#um').onclick=()=>{if(WB) persist(true); WB=null; ui(); go('um')};
 
 let RO=false,LK=[],HC=null,hq='';
 const loadLocks=async()=>{
@@ -361,7 +372,7 @@ m.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest(
  if(a!='rn'&&a!='rt')return;const R=await ST.rget(rid(rs.y,rs.l,rs.r))||[],i=+b.dataset.i;
  if(a=='rt'){R[i][2]=R[i][2]===0?1:0;if(await saveR(R))rrs()}
  else{askIn('แก้ชื่อ-สกุลของ '+R[i][0],async n=>{n=n.replace(/[<>"'&]/g,'');if(!n)return;R[i][1]=n;if(await saveR(R))rrs()});qs('#di').value=R[i][1]}});
-qs('#rsb').onclick=()=>{WB=null;ui();go('rs')};
+qs('#rsb').onclick=()=>{if(WB) persist(true); WB=null; ui(); go('rs')};
 
 const scoreForm=()=>{const pad=(l,f)=>[l,'','',...IN.map(f)];return[[`แบบบันทึกคะแนนตัวชี้วัด ${CV.subject} (${CV.code}) ${CV.level}/${CV.room} ปีการศึกษา ${CV.year}`],['กรอกคะแนนในช่องใต้ตัวชี้วัด (0 ถึงคะแนนเต็ม) · ห้ามแก้เลขประจำตัวและแถวหัวตาราง · ช่องว่าง = ไม่เปลี่ยนคะแนนเดิม · นำเข้าที่ปุ่ม "นำเข้าคะแนนจากไฟล์" ในหน้าบันทึกคะแนน'],[],pad('ลำดับตัวชี้วัด',(x,j)=>j+1),pad('มาตรฐาน',x=>x.s),pad('ตัวชี้วัด',x=>x.c),pad('ภาคเรียน',x=>x.t),pad('คะแนนเต็ม',x=>+x.m||10),['ที่','เลขประจำตัวนักเรียน','ชื่อ-สกุล'],...D.st.map((s,i)=>[i+1,s[0],s[1],...IN.map((_,j)=>S[i][j]??'')])]};
 function readScores(rows){const hr=rows.findIndex(r=>r.some(c=>String(c).includes('เลขประจำตัวนักเรียน'))),nr=rows.findIndex(r=>String(r[0]).trim()=='ลำดับตัวชี้วัด');if(hr<0||nr<0)return null;
@@ -435,8 +446,8 @@ const login=async()=>{
 };
 
 qs('#lg').onclick=login;qs('#pw').onkeydown=e=>{if(e.key=='Enter')login()};
-qs('#out').onclick=()=>{try{sessionStorage.removeItem('pp5u')}catch(e){}ME=WB=null;qs('#app').hidden=true;qs('#gate').hidden=false;qs('#un2').value='';qs('#pw').value='';};
-qs('#hm').onclick=()=>{WB=null;ui();go('hm')};
+qs('#out').onclick=()=>{if(WB) persist(true); try{sessionStorage.removeItem('pp5u')}catch(e){}ME=WB=null;qs('#app').hidden=true;qs('#gate').hidden=false;qs('#un2').value='';qs('#pw').value='';};
+qs('#hm').onclick=()=>{if(WB) persist(true); WB=null; ui(); go('hm')};
 try{
     const su=sessionStorage.getItem('pp5u');
     if(su){
